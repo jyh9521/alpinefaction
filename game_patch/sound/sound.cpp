@@ -16,6 +16,24 @@
 #include "../main/main.h"
 #include "../os/console.h"
 #include "../misc/vpackfile.h"
+#include "../rf/file/file.h"
+#include "../rf/hud.h"
+#include <unordered_map>
+#include <string>
+#include <string_view>
+#include <cctype>
+#include <cmath>
+#include <vector>
+// gr_font.h, not gr.h: split_str / string_aligned / get_font_height /
+// load_font live there, and rf/hud.h only pulls in gr/gr.h.
+#include "../rf/gr/gr_font.h"
+
+// Defined further down, next to the subtitle table. Alpine already hooks both
+// snd_play and snd_play_3d, so we call into it from those hooks rather than
+// installing a second FunHook on the same address -- two hooks on one function
+// means whichever installs last silently wins.
+static void npc_subtitle_on_play(int handle, const rf::Vector3* pos);
+static void cutscene_subtitle_begin(const char* track);
 
 static int g_cutscene_bg_sound_sig = -1;
 static int g_custom_sound_entry_start = -1;
@@ -101,6 +119,7 @@ CallHook<void()> cutscene_play_music_hook{
 FunHook<int(const char*, float)> snd_music_play_cutscene_hook{
     0x00505D70,
     [](const char *filename, float volume) {
+        cutscene_subtitle_begin(filename);
         g_cutscene_bg_sound_sig = snd_music_play_cutscene_hook.call_target(filename, volume);
         return g_cutscene_bg_sound_sig;
     },
@@ -174,6 +193,8 @@ FunHook<int(int, int, float, float)> snd_play_hook{
             xlog::warn("Failed to load sound {}", handle);
             return -1;
         }
+
+        npc_subtitle_on_play(handle, nullptr);
 
         float vol_scale = volume * rf::snd_group_volume[group];
         bool looping = rf::sounds[handle].is_looping;
@@ -257,6 +278,7 @@ FunHook<int(int, const rf::Vector3&, float, const rf::Vector3&, int)> snd_play_3
             return -1;
         }
 
+        npc_subtitle_on_play(handle, &pos);
 
         bool looping = rf::sounds[handle].is_looping;
         int instance_index = snd_get_free_instance();
@@ -787,6 +809,397 @@ void play_chat_sound(const std::string_view msg, const bool is_taunt) {
 
 extern void snd_ds_apply_patch();
 extern void sound_foley_apply_patches();
+
+
+// ---- NPC voice subtitles ----------------------------------------------------
+// Ambient NPC barks have no subtitles in the original game. The table lives in a
+// packfile as UTF-8 text, one entry per line:
+//     <wav filename><TAB><subtitle>
+// Blank lines and lines starting with // are ignored. If the file is absent the
+// feature is simply off and behaviour is identical to stock.
+constexpr const char* npc_subtitle_filename = "alpine_npc_subtitles.tbl";
+
+static std::string npc_sub_lower(const char* s)
+{
+    std::string out;
+    for (; s && *s; ++s) {
+        out += static_cast<char>(std::tolower(static_cast<unsigned char>(*s)));
+    }
+    return out;
+}
+
+static const std::unordered_map<std::string, std::string>& npc_subtitle_table()
+{
+    static std::unordered_map<std::string, std::string> table;
+    static bool loaded = false;
+    if (loaded) {
+        return table;
+    }
+    loaded = true;
+
+    rf::File file;
+    if (file.open(npc_subtitle_filename) != 0) {
+        // Log it: a silent empty table is indistinguishable from a hook that never ran.
+        xlog::info("{} not found, NPC subtitles are off", npc_subtitle_filename);
+        return table;
+    }
+    const int len = file.size();
+    std::string buf(static_cast<size_t>(len), '\0');
+    int total = 0;
+    while (total < len) {
+        const int n = file.read(buf.data() + total, len - total);
+        if (n <= 0) {
+            break;
+        }
+        total += n;
+    }
+    file.close();
+    buf.resize(static_cast<size_t>(total));
+
+    size_t pos = 0;
+    while (pos < buf.size()) {
+        size_t eol = buf.find('\n', pos);
+        if (eol == std::string::npos) {
+            eol = buf.size();
+        }
+        std::string_view line{buf.data() + pos, eol - pos};
+        pos = eol + 1;
+        while (!line.empty() && (line.back() == '\r' || line.back() == ' ')) {
+            line.remove_suffix(1);
+        }
+        if (line.empty() || line.substr(0, 2) == "//") {
+            continue;
+        }
+        const size_t tab = line.find('\t');
+        if (tab == std::string_view::npos) {
+            continue;
+        }
+        // foley.tbl spells these "Grd_Alert_01.wav" but the packfile index has them
+        // upper case, so the key is always lowered on both sides.
+        std::string key{line.substr(0, tab)};
+        for (char& c : key) {
+            c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+        }
+        std::string text{line.substr(tab + 1)};
+        if (!key.empty() && !text.empty()) {
+            table.emplace(std::move(key), std::move(text));
+        }
+    }
+    xlog::info("Loaded {} NPC subtitles from {}", table.size(), npc_subtitle_filename);
+    return table;
+}
+
+static int g_npc_subtitle_debug = 30;   // log the first N lookups, then go quiet
+
+// ---- Independent subtitle channel -------------------------------------------
+// rf::hud_msg is shared with pickup notices ("Picked up ...") and holds at most 8
+// entries, so voice subtitles and item pickups keep pushing each other out. This is
+// a separate queue with its own render pass: it cannot be stepped on, and position,
+// lifetime and styling are ours to set.
+constexpr int npc_subtitle_max_lines = 3;
+
+struct NpcSubtitleLine
+{
+    std::string text;
+    int expire_ms = 0;
+};
+
+static NpcSubtitleLine g_npc_subtitle_queue[npc_subtitle_max_lines];
+
+static void npc_subtitle_push(const std::string& text, int duration_ms)
+{
+    for (int i = 0; i + 1 < npc_subtitle_max_lines; ++i) {
+        g_npc_subtitle_queue[i] = std::move(g_npc_subtitle_queue[i + 1]);
+    }
+    auto& slot = g_npc_subtitle_queue[npc_subtitle_max_lines - 1];
+    slot.text = text;
+    slot.expire_ms = rf::frametime_total_milliseconds + duration_ms;
+}
+
+// Same font the message log body uses (0x006C66F0 is set when the log UI is created).
+// Cached rather than loaded per call: the .vf redirect logs a line every time.
+static auto& npc_subtitle_msglog_font = addr_as_ref<int>(0x006C66F0);
+
+static int npc_subtitle_font()
+{
+    if (npc_subtitle_msglog_font) {
+        return npc_subtitle_msglog_font;
+    }
+    static int fallback = rf::gr::load_font("rfpc-medium.vf");
+    return fallback;
+}
+
+// ---- Cutscene subtitles ------------------------------------------------------
+// In-engine cutscenes do not play their dialogue through snd_play/snd_play_3d at
+// all: the whole scene is one pre-mixed track (RFCS_*_FinalMix.wav) streamed via
+// snd_music_play, so there is no per-line filename to look up. The engine also
+// ships no text for these lines -- they were transcribed and translated by hand.
+// So this is a plain timed track: remember when playback started, then show
+// whichever phrase covers the elapsed time.
+constexpr const char* cutscene_subtitle_filename = "alpine_cutscene_subtitles.tbl";
+
+struct CutscenePhrase
+{
+    int start_ms;
+    int end_ms;
+    std::string text;
+};
+
+// Local decimal parser: avoids pulling <cstdlib> in just for atoi.
+static int cutscene_parse_int(std::string_view s)
+{
+    int v = 0;
+    for (char c : s) {
+        if (c < '0' || c > '9') {
+            break;
+        }
+        v = v * 10 + (c - '0');
+    }
+    return v;
+}
+
+static const std::unordered_map<std::string, std::vector<CutscenePhrase>>& cutscene_subtitle_table()
+{
+    static std::unordered_map<std::string, std::vector<CutscenePhrase>> table;
+    static bool loaded = false;
+    if (loaded) {
+        return table;
+    }
+    loaded = true;
+
+    rf::File file;
+    if (file.open(cutscene_subtitle_filename) != 0) {
+        xlog::info("{} not found, cutscene subtitles are off", cutscene_subtitle_filename);
+        return table;
+    }
+    const int len = file.size();
+    std::string buf(static_cast<size_t>(len), '\0');
+    int total = 0;
+    while (total < len) {
+        const int n = file.read(buf.data() + total, len - total);
+        if (n <= 0) {
+            break;
+        }
+        total += n;
+    }
+    file.close();
+    buf.resize(static_cast<size_t>(total));
+
+    size_t pos = 0;
+    while (pos < buf.size()) {
+        size_t eol = buf.find('\n', pos);
+        if (eol == std::string::npos) {
+            eol = buf.size();
+        }
+        std::string_view line{buf.data() + pos, eol - pos};
+        pos = eol + 1;
+        while (!line.empty() && (line.back() == '\r' || line.back() == ' ')) {
+            line.remove_suffix(1);
+        }
+        if (line.empty() || line.substr(0, 2) == "//") {
+            continue;
+        }
+        const size_t t1 = line.find('\t');
+        if (t1 == std::string_view::npos) continue;
+        const size_t t2 = line.find('\t', t1 + 1);
+        if (t2 == std::string_view::npos) continue;
+        const size_t t3 = line.find('\t', t2 + 1);
+        if (t3 == std::string_view::npos) continue;
+        CutscenePhrase p;
+        p.start_ms = cutscene_parse_int(line.substr(t1 + 1, t2 - t1 - 1));
+        p.end_ms = cutscene_parse_int(line.substr(t2 + 1, t3 - t2 - 1));
+        p.text = std::string{line.substr(t3 + 1)};
+        if (p.end_ms > p.start_ms && !p.text.empty()) {
+            table[npc_sub_lower(std::string{line.substr(0, t1)}.c_str())].push_back(std::move(p));
+        }
+    }
+    size_t n_lines = 0;
+    for (auto& kv : table) {
+        std::sort(kv.second.begin(), kv.second.end(),
+                  [](const CutscenePhrase& a, const CutscenePhrase& b) {
+                      return a.start_ms < b.start_ms;
+                  });
+        n_lines += kv.second.size();
+    }
+    xlog::info("Loaded {} cutscene subtitles across {} tracks from {}",
+        n_lines, table.size(), cutscene_subtitle_filename);
+    return table;
+}
+
+static const std::vector<CutscenePhrase>* g_cutscene_phrases = nullptr;
+static int g_cutscene_started_ms = 0;
+
+static void cutscene_subtitle_begin(const char* track)
+{
+    g_cutscene_phrases = nullptr;
+    if (!track) {
+        return;
+    }
+    const auto& table = cutscene_subtitle_table();
+    const auto it = table.find(npc_sub_lower(track));
+    if (it == table.end()) {
+        return;
+    }
+    g_cutscene_phrases = &it->second;
+    g_cutscene_started_ms = rf::frametime_total_milliseconds;
+    xlog::info("Cutscene subtitles armed for '{}' ({} lines)", track, it->second.size());
+}
+
+// Returns the phrase covering the current playback position, or nullptr.
+static const std::string* cutscene_subtitle_current(int now)
+{
+    if (!g_cutscene_phrases || g_cutscene_bg_sound_sig == -1) {
+        // sig is cleared when the player skips the cutscene
+        return nullptr;
+    }
+    const int elapsed = now - g_cutscene_started_ms;
+    for (const auto& p : *g_cutscene_phrases) {
+        if (elapsed < p.start_ms) {
+            break;      // sorted, so nothing later can match either
+        }
+        if (elapsed < p.end_ms) {
+            return &p.text;
+        }
+    }
+    return nullptr;
+}
+
+void npc_subtitle_render()
+{
+    const int now = rf::frametime_total_milliseconds;
+
+    // Two paths drive this: the HUD message render hook during normal gameplay, and
+    // the cutscene per-frame hook (the HUD is not drawn at all during cutscenes).
+    // Both can run in the same frame, and drawing twice would double the drop shadow,
+    // so the second call in a frame is a no-op.
+    static int last_drawn_ms = -1;
+    if (now == last_drawn_ms) {
+        return;
+    }
+    last_drawn_ms = now;
+
+    const int font = npc_subtitle_font();
+    const int line_h = rf::gr::get_font_height(font);
+    const int clip_w = rf::gr::clip_width();
+    const int clip_h = rf::gr::clip_height();
+    const int max_w = clip_w * 4 / 5;
+
+    // Cutscene line first, then the ordinary queue. During a cutscene the queue is
+    // normally empty anyway, but a sound started just before the cutscene began can
+    // still be expiring, and stacking them is better than one hiding the other.
+    std::vector<std::string> sources;
+    if (const std::string* cut = cutscene_subtitle_current(now)) {
+        sources.push_back(*cut);
+    }
+    for (const auto& slot : g_npc_subtitle_queue) {
+        if (!slot.text.empty() && now < slot.expire_ms) {
+            sources.push_back(slot.text);
+        }
+    }
+
+    std::vector<std::string> lines;
+    for (const auto& src : sources) {
+        // gr_split_str is our CJK aware replacement, so this wraps Chinese correctly
+        std::string buf = src;
+        int len_array[8] = {};
+        int off_array[8] = {};
+        const int n = rf::gr::split_str(len_array, off_array, buf.data(), max_w, 8, 0, font);
+        if (n <= 0) {
+            lines.push_back(buf);
+        }
+        else {
+            for (int i = 0; i < n; ++i) {
+                lines.emplace_back(buf, static_cast<size_t>(off_array[i]),
+                                   static_cast<size_t>(len_array[i]));
+            }
+        }
+    }
+    if (lines.empty()) {
+        return;
+    }
+
+    // Sit above the engine's own message line so the two never overlap.
+    const int center_x = clip_w / 2;
+    int y = clip_h * 84 / 100 - static_cast<int>(lines.size()) * line_h;
+    for (const auto& line : lines) {
+        rf::gr::set_color(0, 0, 0, 170);
+        rf::gr::string_aligned(rf::gr::ALIGN_CENTER, center_x + 2, y + 2, line.c_str(), font);
+        rf::gr::set_color(255, 255, 255, 255);
+        rf::gr::string_aligned(rf::gr::ALIGN_CENTER, center_x, y, line.c_str(), font);
+        y += line_h;
+    }
+}
+
+
+static void npc_subtitle_on_play(int handle, const rf::Vector3* pos)
+{
+    const auto& table = npc_subtitle_table();
+    if (table.empty() || handle < 0 || handle >= 2600) {
+        return;
+    }
+    const rf::Sound& snd = rf::sounds[handle];
+    const auto it = table.find(npc_sub_lower(snd.filename));
+
+    // Diagnostics first, before any of the early returns below. Logging after them
+    // means a line skipped by the persona check leaves no trace at all, which makes
+    // "no subtitle" and "hook never saw it" look identical in the log.
+    // Only level dialogue names (L<n>S<n>_...) are logged, so gunfire and footsteps
+    // do not burn the budget.
+    if (g_npc_subtitle_debug > 0) {
+        const char* fn = snd.filename;
+        // Level dialogue is named L<level>S<scene>_..., e.g. L6S3_GRYN_01.wav.
+        // Checking the first two chars avoids needing <cstring> for strchr.
+        const bool is_dialogue = fn && (fn[0] == 'L' || fn[0] == 'l')
+            && fn[1] >= '0' && fn[1] <= '9';
+        if (is_dialogue || it != table.end()) {
+            --g_npc_subtitle_debug;
+            const int pidx = rf::hud_persona_current_idx;
+            const bool persona_owns = pidx >= 0 && pidx < 10
+                && rf::hud_personas_info[pidx].sound_handle == handle;
+            xlog::info("[npc-sub] '{}' {} in_table={} persona_owns={} alpha={:.2f}",
+                fn ? fn : "(null)", pos ? "3D" : "2D", it != table.end(), persona_owns,
+                rf::hud_persona_alpha);
+        }
+    }
+
+    // Skip only the one line the engine is itself subtitling in the persona box.
+    // HudPersonaInfo::sound_handle and hud_persona_current_idx are both set before the
+    // sound is started (0x0043957C sets the index, the play call reads +0x20 after it),
+    // so this comparison is reliable at the moment we run.
+    //
+    // Do NOT gate on hud_persona_alpha alone: the box is up for several seconds, and
+    // world conversations often happen underneath it -- the level 1 opening has Orion
+    // on the radio while a guard and a miner argue in front of you.
+    const int persona_idx = rf::hud_persona_current_idx;
+    if (persona_idx >= 0 && persona_idx < 10
+        && rf::hud_personas_info[persona_idx].sound_handle == handle) {
+        return;
+    }
+
+    float dist = -1.0f;
+    if (pos) {
+        const float dx = pos->x - rf::sound_listener_pos.x;
+        const float dy = pos->y - rf::sound_listener_pos.y;
+        const float dz = pos->z - rf::sound_listener_pos.z;
+        dist = std::sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    if (it == table.end()) {
+        return;
+    }
+    // Out of earshot: the engine plays it inaudibly, no reason to subtitle it.
+    // Only trust max_range when it is actually set -- snd_get_handle takes min_range
+    // but no max_range, so for dynamically loaded sounds it can be left at zero, and
+    // a naive "dist > max_range" then rejects everything.
+    if (dist >= 0.0f && snd.max_range > 0.0f && dist > snd.max_range) {
+        return;
+    }
+    // Duration follows the clip: long lines stay up long enough to read.
+    const float secs = rf::snd_pc_get_duration(handle);
+    int ms = static_cast<int>(secs * 1000.0f) + 900;
+    ms = std::clamp(ms, 2500, 9000);
+    npc_subtitle_push(it->second, ms);
+}
 
 void apply_sound_patches()
 {

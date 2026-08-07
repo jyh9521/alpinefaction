@@ -577,7 +577,7 @@ void ao_fov_cbox_on_click_callback() {
     }
 }
 void ao_fov_cbox_on_click(int x, int y) {
-    rf::ui::popup_message("Enter new FOV value (0 for automatic scaling):", "", ao_fov_cbox_on_click_callback, 1);
+    rf::ui::popup_message("\xe8\xbe\x93\xe5\x85\xa5\xe6\x96\xb0\xe7\x9a\x84\xe8\xa7\x86\xe5\x9c\xba\xe5\x80\xbc\xef\xbc\x88" "0 \xe4\xb8\xba\xe8\x87\xaa\xe5\x8a\xa8\xe7\xbc\xa9\xe6\x94\xbe\xef\xbc\x89\xef\xbc\x9a", "", ao_fov_cbox_on_click_callback, 1);
 }
 
 // fpgun fov
@@ -594,7 +594,7 @@ void ao_fpfov_cbox_on_click_callback() {
     }
 }
 void ao_fpfov_cbox_on_click(int x, int y) {
-    rf::ui::popup_message("Enter new FPGun FOV modifier value:", "", ao_fpfov_cbox_on_click_callback, 1);
+    rf::ui::popup_message("\xe8\xbe\x93\xe5\x85\xa5\xe6\x96\xb0\xe7\x9a\x84\xe6\xad\xa6\xe5\x99\xa8\xe8\xa7\x86\xe5\x9c\xba\xe4\xbf\xae\xe6\xad\xa3\xe5\x80\xbc\xef\xbc\x9a", "", ao_fpfov_cbox_on_click_callback, 1);
 }
 
 // ms
@@ -611,7 +611,7 @@ void ao_ms_cbox_on_click_callback() {
     }
 }
 void ao_ms_cbox_on_click(int x, int y) {
-    rf::ui::popup_message("Enter new mouse sensitivity value:", "", ao_ms_cbox_on_click_callback, 1);
+    rf::ui::popup_message("\xe8\xbe\x93\xe5\x85\xa5\xe6\x96\xb0\xe7\x9a\x84\xe9\xbc\xa0\xe6\xa0\x87\xe7\x81\xb5\xe6\x95\x8f\xe5\xba\xa6\xef\xbc\x9a", "", ao_ms_cbox_on_click_callback, 1);
 }
 
 // scanner ms
@@ -629,7 +629,7 @@ void ao_scannersens_cbox_on_click_callback() {
     }
 }
 void ao_scannersens_cbox_on_click(int x, int y) {
-    rf::ui::popup_message("Enter new scanner sensitivity modifier value:", "", ao_scannersens_cbox_on_click_callback, 1);
+    rf::ui::popup_message("\xe8\xbe\x93\xe5\x85\xa5\xe6\x96\xb0\xe7\x9a\x84\xe6\x89\xab\xe6\x8f\x8f\xe5\x99\xa8\xe7\x81\xb5\xe6\x95\x8f\xe5\xba\xa6\xe4\xbf\xae\xe6\xad\xa3\xe5\x80\xbc\xef\xbc\x9a", "", ao_scannersens_cbox_on_click_callback, 1);
 }
 
 // scope ms
@@ -647,7 +647,7 @@ void ao_scopesens_cbox_on_click_callback() {
     }
 }
 void ao_scopesens_cbox_on_click(int x, int y) {
-    rf::ui::popup_message("Enter new scope sensitivity modifier value:", "", ao_scopesens_cbox_on_click_callback, 1);
+    rf::ui::popup_message("\xe8\xbe\x93\xe5\x85\xa5\xe6\x96\xb0\xe7\x9a\x84\xe7\x9e\x84\xe5\x87\x86\xe9\x95\x9c\xe7\x81\xb5\xe6\x95\x8f\xe5\xba\xa6\xe4\xbf\xae\xe6\xad\xa3\xe5\x80\xbc\xef\xbc\x9a", "", ao_scopesens_cbox_on_click_callback, 1);
 }
 
 // reticle scale
@@ -664,7 +664,7 @@ void ao_retscale_cbox_on_click_callback() {
     }
 }
 void ao_retscale_cbox_on_click(int x, int y) {
-    rf::ui::popup_message("Enter new reticle scale value:", "", ao_retscale_cbox_on_click_callback, 1);
+    rf::ui::popup_message("\xe8\xbe\x93\xe5\x85\xa5\xe6\x96\xb0\xe7\x9a\x84\xe5\x87\x86\xe6\x98\x9f\xe7\xbc\xa9\xe6\x94\xbe\xe5\x80\xbc\xef\xbc\x9a", "", ao_retscale_cbox_on_click_callback, 1);
 }
 
 // max fps
@@ -684,7 +684,7 @@ void ao_maxfps_cbox_on_click_callback()
 }
 void ao_maxfps_cbox_on_click(int x, int y)
 {
-    rf::ui::popup_message("Enter new maximum FPS value:", "", ao_maxfps_cbox_on_click_callback, 1);
+    rf::ui::popup_message("\xe8\xbe\x93\xe5\x85\xa5\xe6\x96\xb0\xe7\x9a\x84\xe6\x9c\x80\xe5\xa4\xa7\xe5\xb8\xa7\xe7\x8e\x87\xef\xbc\x9a", "", ao_maxfps_cbox_on_click_callback, 1);
 }
 
 // lod dist scale
@@ -703,7 +703,7 @@ void ao_loddist_cbox_on_click_callback()
 }
 void ao_loddist_cbox_on_click(int x, int y)
 {
-    rf::ui::popup_message("Enter new LOD distance scale value:", "", ao_loddist_cbox_on_click_callback, 1);
+    rf::ui::popup_message("\xe8\xbe\x93\xe5\x85\xa5\xe6\x96\xb0\xe7\x9a\x84 LOD \xe8\xb7\x9d\xe7\xa6\xbb\xe7\xbc\xa9\xe6\x94\xbe\xe5\x80\xbc\xef\xbc\x9a", "", ao_loddist_cbox_on_click_callback, 1);
 }
 
 // simulation distance
@@ -723,7 +723,7 @@ void ao_simdist_cbox_on_click_callback()
 }
 void ao_simdist_cbox_on_click(int x, int y)
 {
-    rf::ui::popup_message("Enter new simulation distance value:", "", ao_simdist_cbox_on_click_callback, 1);
+    rf::ui::popup_message("\xe8\xbe\x93\xe5\x85\xa5\xe6\x96\xb0\xe7\x9a\x84\xe6\xa8\xa1\xe6\x8b\x9f\xe8\xb7\x9d\xe7\xa6\xbb\xe5\x80\xbc\xef\xbc\x9a", "", ao_simdist_cbox_on_click_callback, 1);
 }
 
 void ao_mpcharlod_cbox_on_click(int x, int y) {
@@ -985,7 +985,7 @@ void ao_notex_cbox_on_click(int x, int y) {
     ao_play_button_snd(g_alpine_game_config.try_disable_textures);
 }
 
-static constexpr const char* meshlight_mode_names[] = {"Ambient", "Vertex", "Pixel"};
+static constexpr const char* meshlight_mode_names[] = {"\xe7\x8e\xaf\xe5\xa2\x83\xe5\x85\x89", "\xe9\xa1\xb6\xe7\x82\xb9", "\xe9\x80\x90\xe5\x83\x8f\xe7\xb4\xa0"};
 
 void ao_meshlight_cbox_on_click(int x, int y) {
     g_alpine_game_config.mesh_lighting_mode = (g_alpine_game_config.mesh_lighting_mode + 1) % 3;
@@ -1130,135 +1130,135 @@ void alpine_options_panel_init() {
 
     // tabs
     alpine_options_panel_tab_init(
-        &ao_tab_0_cbox, &ao_tab_0_label, ao_tab_button_on_click_0, alpine_options_panel_current_tab == 0, 107, 0, 27, "Visual");
+        &ao_tab_0_cbox, &ao_tab_0_label, ao_tab_button_on_click_0, alpine_options_panel_current_tab == 0, 107, 0, 28, "\xe7\x94\xbb\xe9\x9d\xa2");
     alpine_options_panel_tab_init(
-        &ao_tab_1_cbox, &ao_tab_1_label, ao_tab_button_on_click_1, alpine_options_panel_current_tab == 1, 199, 0, 18, "Interface");
+        &ao_tab_1_cbox, &ao_tab_1_label, ao_tab_button_on_click_1, alpine_options_panel_current_tab == 1, 199, 0, 28, "\xe7\x95\x8c\xe9\x9d\xa2");
     alpine_options_panel_tab_init(
-        &ao_tab_2_cbox, &ao_tab_2_label, ao_tab_button_on_click_2, alpine_options_panel_current_tab == 2, 291, 0, 29, "Input");
+        &ao_tab_2_cbox, &ao_tab_2_label, ao_tab_button_on_click_2, alpine_options_panel_current_tab == 2, 291, 0, 28, "\xe8\xbe\x93\xe5\x85\xa5");
     alpine_options_panel_tab_init(
-        &ao_tab_3_cbox, &ao_tab_3_label, ao_tab_button_on_click_3, alpine_options_panel_current_tab == 3, 383, 0, 30, "Misc");
+        &ao_tab_3_cbox, &ao_tab_3_label, ao_tab_button_on_click_3, alpine_options_panel_current_tab == 3, 383, 0, 28, "\xe5\x85\xb6\xe4\xbb\x96");
 
     // panel 0
     alpine_options_panel_checkbox_init(
-        &ao_enemybullets_cbox, &ao_enemybullets_label, &alpine_options_panel0, ao_enemybullets_cbox_on_click, g_alpine_game_config.show_enemy_bullets, 112, 54, "Enemy bullets");
+        &ao_enemybullets_cbox, &ao_enemybullets_label, &alpine_options_panel0, ao_enemybullets_cbox_on_click, g_alpine_game_config.show_enemy_bullets, 112, 54, "\xe6\x95\x8c\xe6\x96\xb9\xe5\xad\x90\xe5\xbc\xb9");
     alpine_options_panel_checkbox_init(
-        &ao_notex_cbox, &ao_notex_label, &alpine_options_panel0, ao_notex_cbox_on_click, g_alpine_game_config.try_disable_textures, 112, 84, "Lightmaps only");
+        &ao_notex_cbox, &ao_notex_label, &alpine_options_panel0, ao_notex_cbox_on_click, g_alpine_game_config.try_disable_textures, 112, 84, "\xe4\xbb\x85\xe5\x85\x89\xe7\x85\xa7\xe8\xb4\xb4\xe5\x9b\xbe");
     alpine_options_panel_checkbox_init(
-        &ao_weapshake_cbox, &ao_weapshake_label, &alpine_options_panel0, ao_weapshake_cbox_on_click, !g_alpine_game_config.try_disable_weapon_shake, 112, 114, "Weapon shake");
+        &ao_weapshake_cbox, &ao_weapshake_label, &alpine_options_panel0, ao_weapshake_cbox_on_click, !g_alpine_game_config.try_disable_weapon_shake, 112, 114, "\xe6\xad\xa6\xe5\x99\xa8\xe6\x8a\x96\xe5\x8a\xa8");
     alpine_options_panel_inputbox_init(
-        &ao_fov_cbox, &ao_fov_label, &ao_fov_butlabel, &alpine_options_panel0, ao_fov_cbox_on_click, 112, 144, "Horizontal FOV");
+        &ao_fov_cbox, &ao_fov_label, &ao_fov_butlabel, &alpine_options_panel0, ao_fov_cbox_on_click, 112, 144, "\xe6\xb0\xb4\xe5\xb9\xb3\xe8\xa7\x86\xe5\x9c\xba");
     alpine_options_panel_inputbox_init(
-        &ao_fpfov_cbox, &ao_fpfov_label, &ao_fpfov_butlabel, &alpine_options_panel0, ao_fpfov_cbox_on_click, 112, 174, "Gun FOV mod");
+        &ao_fpfov_cbox, &ao_fpfov_label, &ao_fpfov_butlabel, &alpine_options_panel0, ao_fpfov_cbox_on_click, 112, 174, "\xe6\xad\xa6\xe5\x99\xa8\xe8\xa7\x86\xe5\x9c\xba\xe4\xbf\xae\xe6\xad\xa3");
     alpine_options_panel_inputbox_init(
-        &ao_maxfps_cbox, &ao_maxfps_label, &ao_maxfps_butlabel, &alpine_options_panel0, ao_maxfps_cbox_on_click, 112, 204, "Max FPS");
+        &ao_maxfps_cbox, &ao_maxfps_label, &ao_maxfps_butlabel, &alpine_options_panel0, ao_maxfps_cbox_on_click, 112, 204, "\xe6\x9c\x80\xe5\xa4\xa7\xe5\xb8\xa7\xe7\x8e\x87");
     alpine_options_panel_inputbox_init(
-        &ao_simdist_cbox, &ao_simdist_label, &ao_simdist_butlabel, &alpine_options_panel0, ao_simdist_cbox_on_click, 112, 234, "Simulation dist");
+        &ao_simdist_cbox, &ao_simdist_label, &ao_simdist_butlabel, &alpine_options_panel0, ao_simdist_cbox_on_click, 112, 234, "\xe6\xa8\xa1\xe6\x8b\x9f\xe8\xb7\x9d\xe7\xa6\xbb");
     alpine_options_panel_inputbox_init(
-        &ao_loddist_cbox, &ao_loddist_label, &ao_loddist_butlabel, &alpine_options_panel0, ao_loddist_cbox_on_click, 112, 262, "LOD scale");
+        &ao_loddist_cbox, &ao_loddist_label, &ao_loddist_butlabel, &alpine_options_panel0, ao_loddist_cbox_on_click, 112, 262, "LOD \xe7\xbc\xa9\xe6\x94\xbe");
     alpine_options_panel_checkbox_init(
-        &ao_unclamplights_cbox, &ao_unclamplights_label, &alpine_options_panel0, ao_unclamplights_cbox_on_click, g_alpine_game_config.full_range_lighting, 112, 292, "Full light range");
+        &ao_unclamplights_cbox, &ao_unclamplights_label, &alpine_options_panel0, ao_unclamplights_cbox_on_click, g_alpine_game_config.full_range_lighting, 112, 292, "\xe5\xae\x8c\xe6\x95\xb4\xe5\x85\x89\xe7\x85\xa7\xe8\x8c\x83\xe5\x9b\xb4");
 
     alpine_options_panel_checkbox_init(
-        &ao_camshake_cbox, &ao_camshake_label, &alpine_options_panel0, ao_camshake_cbox_on_click, !g_alpine_game_config.screen_shake_force_off, 280, 54, "View shake (SP)");
+        &ao_camshake_cbox, &ao_camshake_label, &alpine_options_panel0, ao_camshake_cbox_on_click, !g_alpine_game_config.screen_shake_force_off, 280, 54, "\xe8\xa7\x86\xe8\xa7\x92\xe6\x8a\x96\xe5\x8a\xa8\xef\xbc\x88\xe5\x8d\x95\xe4\xba\xba\xef\xbc\x89");
     alpine_options_panel_checkbox_init(
-        &ao_ricochet_cbox, &ao_ricochet_label, &alpine_options_panel0, ao_ricochet_cbox_on_click, g_alpine_game_config.multi_ricochet, 280, 84, "Ricochet FX (MP)");
+        &ao_ricochet_cbox, &ao_ricochet_label, &alpine_options_panel0, ao_ricochet_cbox_on_click, g_alpine_game_config.multi_ricochet, 280, 84, "\xe8\xb7\xb3\xe5\xbc\xb9\xe7\x89\xb9\xe6\x95\x88\xef\xbc\x88\xe5\xa4\x9a\xe4\xba\xba\xef\xbc\x89");
     alpine_options_panel_checkbox_init(
-        &ao_fullbrightchar_cbox, &ao_fullbrightchar_label, &alpine_options_panel0, ao_fullbrightchar_cbox_on_click, g_alpine_game_config.try_fullbright_characters, 280, 114, "Fullbright models");
+        &ao_fullbrightchar_cbox, &ao_fullbrightchar_label, &alpine_options_panel0, ao_fullbrightchar_cbox_on_click, g_alpine_game_config.try_fullbright_characters, 280, 114, "\xe5\x85\xa8\xe4\xba\xae\xe6\xa8\xa1\xe5\x9e\x8b");
     alpine_options_panel_inputbox_init(
-        &ao_meshlight_cbox, &ao_meshlight_label, &ao_meshlight_butlabel, &alpine_options_panel0, ao_meshlight_cbox_on_click, 280, 144, "Mesh lighting");
+        &ao_meshlight_cbox, &ao_meshlight_label, &ao_meshlight_butlabel, &alpine_options_panel0, ao_meshlight_cbox_on_click, 280, 144, "\xe7\xbd\x91\xe6\xa0\xbc\xe5\x85\x89\xe7\x85\xa7");
     alpine_options_panel_checkbox_init(
-        &ao_nearest_cbox, &ao_nearest_label, &alpine_options_panel0, ao_nearest_cbox_on_click, g_alpine_game_config.nearest_texture_filtering, 280, 174, "Nearest filtering");
+        &ao_nearest_cbox, &ao_nearest_label, &alpine_options_panel0, ao_nearest_cbox_on_click, g_alpine_game_config.nearest_texture_filtering, 280, 174, "\xe9\x82\xbb\xe8\xbf\x91\xe8\xbf\x87\xe6\xbb\xa4");
     alpine_options_panel_checkbox_init(
-        &ao_glares_cbox, &ao_glares_label, &alpine_options_panel0, ao_glares_cbox_on_click, g_alpine_game_config.show_glares, 280, 204, "Light glares");
+        &ao_glares_cbox, &ao_glares_label, &alpine_options_panel0, ao_glares_cbox_on_click, g_alpine_game_config.show_glares, 280, 204, "\xe5\x85\x89\xe6\x99\x95");
     alpine_options_panel_checkbox_init(
-        &ao_firelights_cbox, &ao_firelights_label, &alpine_options_panel0, ao_firelights_cbox_on_click, !g_alpine_game_config.try_disable_muzzle_flash_lights, 280, 234, "Muzzle lights");
+        &ao_firelights_cbox, &ao_firelights_label, &alpine_options_panel0, ao_firelights_cbox_on_click, !g_alpine_game_config.try_disable_muzzle_flash_lights, 280, 234, "\xe6\x9e\xaa\xe5\x8f\xa3\xe9\x97\xaa\xe5\x85\x89");
     alpine_options_panel_checkbox_init(
-        &ao_mpcharlod_cbox, &ao_mpcharlod_label, &alpine_options_panel0, ao_mpcharlod_cbox_on_click, !g_alpine_game_config.multi_no_character_lod, 280, 262, "Entity LOD (MP)");
+        &ao_mpcharlod_cbox, &ao_mpcharlod_label, &alpine_options_panel0, ao_mpcharlod_cbox_on_click, !g_alpine_game_config.multi_no_character_lod, 280, 262, "\xe5\xae\x9e\xe4\xbd\x93 LOD\xef\xbc\x88\xe5\xa4\x9a\xe4\xba\xba\xef\xbc\x89");
     alpine_options_panel_checkbox_init(
-        &ao_vsync_cbox, &ao_vsync_label, &alpine_options_panel0, ao_vsync_cbox_on_click, g_alpine_system_config.vsync, 280, 292, "Vertical sync");
+        &ao_vsync_cbox, &ao_vsync_label, &alpine_options_panel0, ao_vsync_cbox_on_click, g_alpine_system_config.vsync, 280, 292, "\xe5\x9e\x82\xe7\x9b\xb4\xe5\x90\x8c\xe6\xad\xa5");
 
     // panel 1
     alpine_options_panel_checkbox_init(
-        &ao_bighud_cbox, &ao_bighud_label, &alpine_options_panel1, ao_bighud_cbox_on_click, g_alpine_game_config.big_hud, 112, 54, "Big HUD");
+        &ao_bighud_cbox, &ao_bighud_label, &alpine_options_panel1, ao_bighud_cbox_on_click, g_alpine_game_config.big_hud, 112, 54, "\xe5\xa4\xa7\xe5\x8f\xb7 HUD");
     alpine_options_panel_checkbox_init(
-        &ao_damagenum_cbox, &ao_damagenum_label, &alpine_options_panel1, ao_damagenum_cbox_on_click, g_alpine_game_config.world_hud_damage_numbers, 112, 84, "Hit numbers");
+        &ao_damagenum_cbox, &ao_damagenum_label, &alpine_options_panel1, ao_damagenum_cbox_on_click, g_alpine_game_config.world_hud_damage_numbers, 112, 84, "\xe4\xbc\xa4\xe5\xae\xb3\xe6\x95\xb0\xe5\xad\x97");
     alpine_options_panel_checkbox_init(
-        &ao_showfps_cbox, &ao_showfps_label, &alpine_options_panel1, ao_showfps_cbox_on_click, g_alpine_game_config.fps_counter, 112, 114, "Show FPS");
+        &ao_showfps_cbox, &ao_showfps_label, &alpine_options_panel1, ao_showfps_cbox_on_click, g_alpine_game_config.fps_counter, 112, 114, "\xe6\x98\xbe\xe7\xa4\xba\xe5\xb8\xa7\xe7\x8e\x87");
     alpine_options_panel_checkbox_init(
-        &ao_showping_cbox, &ao_showping_label, &alpine_options_panel1, ao_showping_cbox_on_click, g_alpine_game_config.ping_display, 112, 144, "Show ping");
+        &ao_showping_cbox, &ao_showping_label, &alpine_options_panel1, ao_showping_cbox_on_click, g_alpine_game_config.ping_display, 112, 144, "\xe6\x98\xbe\xe7\xa4\xba\xe5\xbb\xb6\xe8\xbf\x9f");
     alpine_options_panel_checkbox_init(
-        &ao_redflash_cbox, &ao_redflash_label, &alpine_options_panel1, ao_redflash_cbox_on_click, g_alpine_game_config.damage_screen_flash, 112, 174, "Damage flash");
+        &ao_redflash_cbox, &ao_redflash_label, &alpine_options_panel1, ao_redflash_cbox_on_click, g_alpine_game_config.damage_screen_flash, 112, 174, "\xe5\x8f\x97\xe4\xbc\xa4\xe9\x97\xaa\xe7\x83\x81");
     alpine_options_panel_checkbox_init(
-        &ao_deathbars_cbox, &ao_deathbars_label, &alpine_options_panel1, ao_deathbars_cbox_on_click, g_alpine_game_config.death_bars, 112, 204, "Death bars");
+        &ao_deathbars_cbox, &ao_deathbars_label, &alpine_options_panel1, ao_deathbars_cbox_on_click, g_alpine_game_config.death_bars, 112, 204, "\xe6\xad\xbb\xe4\xba\xa1\xe9\xbb\x91\xe8\xbe\xb9");
     alpine_options_panel_checkbox_init(
-        &ao_locpings_cbox, &ao_locpings_label, &alpine_options_panel1, ao_locpings_cbox_on_click, g_alpine_game_config.show_location_pings, 112, 234, "Location pings");
+        &ao_locpings_cbox, &ao_locpings_label, &alpine_options_panel1, ao_locpings_cbox_on_click, g_alpine_game_config.show_location_pings, 112, 234, "\xe4\xbd\x8d\xe7\xbd\xae\xe6\xa0\x87\xe8\xae\xb0");
     alpine_options_panel_inputbox_init(
-        &ao_retscale_cbox, &ao_retscale_label, &ao_retscale_butlabel, &alpine_options_panel1, ao_retscale_cbox_on_click, 112, 262, "Reticle scale");
+        &ao_retscale_cbox, &ao_retscale_label, &ao_retscale_butlabel, &alpine_options_panel1, ao_retscale_cbox_on_click, 112, 262, "\xe5\x87\x86\xe6\x98\x9f\xe7\xbc\xa9\xe6\x94\xbe");
 
     alpine_options_panel_checkbox_init(
-        &ao_ctfwh_cbox, &ao_ctfwh_label, &alpine_options_panel1, ao_ctfwh_cbox_on_click, g_alpine_game_config.world_hud_ctf_icons, 280, 54, "CTF icons");
+        &ao_ctfwh_cbox, &ao_ctfwh_label, &alpine_options_panel1, ao_ctfwh_cbox_on_click, g_alpine_game_config.world_hud_ctf_icons, 280, 54, "\xe5\xa4\xba\xe6\x97\x97\xe5\x9b\xbe\xe6\xa0\x87");
     alpine_options_panel_checkbox_init(
-        &ao_flag_overdrawwh_cbox, &ao_flag_overdrawwh_label, &alpine_options_panel1, ao_flag_overdrawwh_cbox_on_click, g_alpine_game_config.world_hud_flag_overdraw, 280, 84, "Overdraw flags");
+        &ao_flag_overdrawwh_cbox, &ao_flag_overdrawwh_label, &alpine_options_panel1, ao_flag_overdrawwh_cbox_on_click, g_alpine_game_config.world_hud_flag_overdraw, 280, 84, "\xe6\x97\x97\xe5\xb8\x9c\xe7\xa9\xbf\xe9\x80\x8f\xe6\x98\xbe\xe7\xa4\xba");
     alpine_options_panel_checkbox_init(
-        &ao_hill_overdrawwh_cbox, &ao_hill_overdrawwh_label, &alpine_options_panel1, ao_hill_overdrawwh_cbox_on_click, g_alpine_game_config.world_hud_hill_overdraw, 280, 114, "Overdraw CPs");
+        &ao_hill_overdrawwh_cbox, &ao_hill_overdrawwh_label, &alpine_options_panel1, ao_hill_overdrawwh_cbox_on_click, g_alpine_game_config.world_hud_hill_overdraw, 280, 114, "\xe6\x8e\xa7\xe5\x88\xb6\xe7\x82\xb9\xe7\xa9\xbf\xe9\x80\x8f\xe6\x98\xbe\xe7\xa4\xba");
     alpine_options_panel_checkbox_init(
-        &ao_sbanim_cbox, &ao_sbanim_label, &alpine_options_panel1, ao_sbanim_cbox_on_click, g_alpine_game_config.scoreboard_anim, 280, 144, "Scoreboard anim");
+        &ao_sbanim_cbox, &ao_sbanim_label, &alpine_options_panel1, ao_sbanim_cbox_on_click, g_alpine_game_config.scoreboard_anim, 280, 144, "\xe8\xae\xa1\xe5\x88\x86\xe6\x9d\xbf\xe5\x8a\xa8\xe7\x94\xbb");
     alpine_options_panel_checkbox_init(
-        &ao_teamlabels_cbox, &ao_teamlabels_label, &alpine_options_panel1, ao_teamlabels_cbox_on_click, g_alpine_game_config.world_hud_team_player_labels, 280, 174, "Label teammates");
+        &ao_teamlabels_cbox, &ao_teamlabels_label, &alpine_options_panel1, ao_teamlabels_cbox_on_click, g_alpine_game_config.world_hud_team_player_labels, 280, 174, "\xe9\x98\x9f\xe5\x8f\x8b\xe6\xa0\x87\xe7\xad\xbe");
     alpine_options_panel_checkbox_init(
-        &ao_minimaltimer_cbox, &ao_minimaltimer_label, &alpine_options_panel1, ao_minimaltimer_cbox_on_click, !g_alpine_game_config.verbose_time_left_display, 280, 204, "Minimal timer");
+        &ao_minimaltimer_cbox, &ao_minimaltimer_label, &alpine_options_panel1, ao_minimaltimer_cbox_on_click, !g_alpine_game_config.verbose_time_left_display, 280, 204, "\xe7\xb2\xbe\xe7\xae\x80\xe8\xae\xa1\xe6\x97\xb6\xe5\x99\xa8");
     alpine_options_panel_checkbox_init(
-        &ao_targetnames_cbox, &ao_targetnames_label, &alpine_options_panel1, ao_targetnames_cbox_on_click, g_alpine_game_config.display_target_player_names, 280, 234, "Target names");
+        &ao_targetnames_cbox, &ao_targetnames_label, &alpine_options_panel1, ao_targetnames_cbox_on_click, g_alpine_game_config.display_target_player_names, 280, 234, "\xe7\x9b\xae\xe6\xa0\x87\xe5\x90\x8d\xe7\xa7\xb0");
     alpine_options_panel_checkbox_init(
-        &ao_always_show_spectators_cbox, &ao_always_show_spectators_label, &alpine_options_panel1, ao_always_show_spectators_cbox_on_click, g_alpine_game_config.always_show_spectators, 280, 264, "Show spectators");
+        &ao_always_show_spectators_cbox, &ao_always_show_spectators_label, &alpine_options_panel1, ao_always_show_spectators_cbox_on_click, g_alpine_game_config.always_show_spectators, 280, 264, "\xe6\x98\xbe\xe7\xa4\xba\xe8\xa7\x82\xe6\x88\x98\xe8\x80\x85");
 
     // panel 2
     alpine_options_panel_checkbox_init(
         &ao_dinput_cbox, &ao_dinput_label, &alpine_options_panel2, ao_dinput_cbox_on_click, g_alpine_game_config.direct_input, 112, 54, "DirectInput"); 
     alpine_options_panel_checkbox_init(
-        &ao_linearpitch_cbox, &ao_linearpitch_label, &alpine_options_panel2, ao_linearpitch_cbox_on_click, g_alpine_game_config.mouse_linear_pitch, 112, 84, "Linear pitch");
+        &ao_linearpitch_cbox, &ao_linearpitch_label, &alpine_options_panel2, ao_linearpitch_cbox_on_click, g_alpine_game_config.mouse_linear_pitch, 112, 84, "\xe7\xba\xbf\xe6\x80\xa7\xe4\xbf\xaf\xe4\xbb\xb0");
     alpine_options_panel_checkbox_init(
-        &ao_swapar_cbox, &ao_swapar_label, &alpine_options_panel2, ao_swapar_cbox_on_click, g_alpine_game_config.swap_ar_controls, 112, 114, "Swap AR");
+        &ao_swapar_cbox, &ao_swapar_label, &alpine_options_panel2, ao_swapar_cbox_on_click, g_alpine_game_config.swap_ar_controls, 112, 114, "\xe4\xba\xa4\xe6\x8d\xa2\xe7\xaa\x81\xe5\x87\xbb\xe6\xad\xa5\xe6\x9e\xaa\xe9\x94\xae");
     alpine_options_panel_checkbox_init(
-        &ao_swapgn_cbox, &ao_swapgn_label, &alpine_options_panel2, ao_swapgn_cbox_on_click, g_alpine_game_config.swap_gn_controls, 112, 144, "Swap Grenade");
+        &ao_swapgn_cbox, &ao_swapgn_label, &alpine_options_panel2, ao_swapgn_cbox_on_click, g_alpine_game_config.swap_gn_controls, 112, 144, "\xe4\xba\xa4\xe6\x8d\xa2\xe6\x89\x8b\xe9\x9b\xb7\xe9\x94\xae");
     alpine_options_panel_checkbox_init(
-        &ao_swapsg_cbox, &ao_swapsg_label, &alpine_options_panel2, ao_swapsg_cbox_on_click, g_alpine_game_config.swap_sg_controls, 112, 174, "Swap Shotgun");
+        &ao_swapsg_cbox, &ao_swapsg_label, &alpine_options_panel2, ao_swapsg_cbox_on_click, g_alpine_game_config.swap_sg_controls, 112, 174, "\xe4\xba\xa4\xe6\x8d\xa2\xe9\x9c\xb0\xe5\xbc\xb9\xe6\x9e\xaa\xe9\x94\xae");
 
     alpine_options_panel_inputbox_init(
-        &ao_ms_cbox, &ao_ms_label, &ao_ms_butlabel, &alpine_options_panel2, ao_ms_cbox_on_click, 280, 54, "Mouse sensitivity");
+        &ao_ms_cbox, &ao_ms_label, &ao_ms_butlabel, &alpine_options_panel2, ao_ms_cbox_on_click, 280, 54, "\xe9\xbc\xa0\xe6\xa0\x87\xe7\x81\xb5\xe6\x95\x8f\xe5\xba\xa6");
     alpine_options_panel_inputbox_init(
-        &ao_scannersens_cbox, &ao_scannersens_label, &ao_scannersens_butlabel, &alpine_options_panel2, ao_scannersens_cbox_on_click, 280, 84, "Scanner modifier");
+        &ao_scannersens_cbox, &ao_scannersens_label, &ao_scannersens_butlabel, &alpine_options_panel2, ao_scannersens_cbox_on_click, 280, 84, "\xe6\x89\xab\xe6\x8f\x8f\xe5\x99\xa8\xe7\x81\xb5\xe6\x95\x8f\xe5\xba\xa6");
     alpine_options_panel_inputbox_init(
-        &ao_scopesens_cbox, &ao_scopesens_label, &ao_scopesens_butlabel, &alpine_options_panel2, ao_scopesens_cbox_on_click, 280, 114, "Scope modifier");
+        &ao_scopesens_cbox, &ao_scopesens_label, &ao_scopesens_butlabel, &alpine_options_panel2, ao_scopesens_cbox_on_click, 280, 114, "\xe7\x9e\x84\xe5\x87\x86\xe9\x95\x9c\xe7\x81\xb5\xe6\x95\x8f\xe5\xba\xa6");
     alpine_options_panel_checkbox_init(
-        &ao_staticscope_cbox, &ao_staticscope_label, &alpine_options_panel2, ao_staticscope_cbox_on_click, g_alpine_game_config.scope_static_sensitivity, 280, 144, "Linear scope");
+        &ao_staticscope_cbox, &ao_staticscope_label, &alpine_options_panel2, ao_staticscope_cbox_on_click, g_alpine_game_config.scope_static_sensitivity, 280, 144, "\xe7\xba\xbf\xe6\x80\xa7\xe7\x9e\x84\xe5\x87\x86\xe9\x95\x9c");
     alpine_options_panel_checkbox_init(
-        &ao_togglecrouch_cbox, &ao_togglecrouch_label, &alpine_options_panel2, ao_togglecrouch_cbox_on_click, rf::local_player->settings.toggle_crouch, 280, 174, "Toggle crouch");
+        &ao_togglecrouch_cbox, &ao_togglecrouch_label, &alpine_options_panel2, ao_togglecrouch_cbox_on_click, rf::local_player->settings.toggle_crouch, 280, 174, "\xe5\x88\x87\xe6\x8d\xa2\xe8\xb9\xb2\xe4\xb8\x8b");
 
     // panel 3
     alpine_options_panel_checkbox_init(
-        &ao_hitsounds_cbox, &ao_hitsounds_label, &alpine_options_panel3, ao_hitsounds_cbox_on_click, g_alpine_game_config.play_hit_sounds, 112, 54, "Hit sounds");
+        &ao_hitsounds_cbox, &ao_hitsounds_label, &alpine_options_panel3, ao_hitsounds_cbox_on_click, g_alpine_game_config.play_hit_sounds, 112, 54, "\xe5\x91\xbd\xe4\xb8\xad\xe9\x9f\xb3\xe6\x95\x88");
     alpine_options_panel_checkbox_init(
-        &ao_taunts_cbox, &ao_taunts_label, &alpine_options_panel3, ao_taunts_cbox_on_click, g_alpine_game_config.play_taunt_sounds, 112, 84, "Taunt sounds");
+        &ao_taunts_cbox, &ao_taunts_label, &alpine_options_panel3, ao_taunts_cbox_on_click, g_alpine_game_config.play_taunt_sounds, 112, 84, "\xe5\x98\xb2\xe8\xae\xbd\xe9\x9f\xb3\xe6\x95\x88");
     alpine_options_panel_checkbox_init(
-        &ao_autosave_cbox, &ao_autosave_label, &alpine_options_panel3, ao_autosave_cbox_on_click, g_alpine_game_config.autosave, 112, 114, "Autosave");
+        &ao_autosave_cbox, &ao_autosave_label, &alpine_options_panel3, ao_autosave_cbox_on_click, g_alpine_game_config.autosave, 112, 114, "\xe8\x87\xaa\xe5\x8a\xa8\xe5\xad\x98\xe6\xa1\xa3");
     alpine_options_panel_checkbox_init(
-        &ao_joinbeep_cbox, &ao_joinbeep_label, &alpine_options_panel3, ao_joinbeep_cbox_on_click, g_alpine_game_config.player_join_beep, 112, 144, "Join beep");
+        &ao_joinbeep_cbox, &ao_joinbeep_label, &alpine_options_panel3, ao_joinbeep_cbox_on_click, g_alpine_game_config.player_join_beep, 112, 144, "\xe5\x8a\xa0\xe5\x85\xa5\xe6\x8f\x90\xe7\xa4\xba\xe9\x9f\xb3");
     alpine_options_panel_checkbox_init(
-        &ao_painsounds_cbox, &ao_painsounds_label, &alpine_options_panel3, ao_painsounds_cbox_on_click, g_alpine_game_config.entity_pain_sounds, 112, 174, "Pain sounds");
+        &ao_painsounds_cbox, &ao_painsounds_label, &alpine_options_panel3, ao_painsounds_cbox_on_click, g_alpine_game_config.entity_pain_sounds, 112, 174, "\xe5\x8f\x97\xe4\xbc\xa4\xe9\x9f\xb3\xe6\x95\x88");
     alpine_options_panel_checkbox_init(
-        &ao_geochunk_cbox, &ao_geochunk_label, &alpine_options_panel3, ao_geochunk_cbox_on_click, g_alpine_game_config.geo_chunk_physics, 112, 204, "Geo chunks");
+        &ao_geochunk_cbox, &ao_geochunk_label, &alpine_options_panel3, ao_geochunk_cbox_on_click, g_alpine_game_config.geo_chunk_physics, 112, 204, "\xe5\x9c\xb0\xe5\xbd\xa2\xe7\xa2\x8e\xe5\x9d\x97");
 
     alpine_options_panel_checkbox_init(
-        &ao_teamrad_cbox, &ao_teamrad_label, &alpine_options_panel3, ao_teamrad_cbox_on_click, g_alpine_game_config.play_team_rad_msg_sounds, 280, 54, "Team radio msgs");
+        &ao_teamrad_cbox, &ao_teamrad_label, &alpine_options_panel3, ao_teamrad_cbox_on_click, g_alpine_game_config.play_team_rad_msg_sounds, 280, 54, "\xe9\x98\x9f\xe4\xbc\x8d\xe7\x94\xb5\xe5\x8f\xb0\xe6\xb6\x88\xe6\x81\xaf");
     alpine_options_panel_checkbox_init(
-        &ao_globalrad_cbox, &ao_globalrad_label, &alpine_options_panel3, ao_globalrad_cbox_on_click, g_alpine_game_config.play_global_rad_msg_sounds, 280, 84, "Global radio msgs");
+        &ao_globalrad_cbox, &ao_globalrad_label, &alpine_options_panel3, ao_globalrad_cbox_on_click, g_alpine_game_config.play_global_rad_msg_sounds, 280, 84, "\xe5\x85\xa8\xe5\xb1\x80\xe7\x94\xb5\xe5\x8f\xb0\xe6\xb6\x88\xe6\x81\xaf");
     alpine_options_panel_checkbox_init(
-        &ao_gaussian_cbox, &ao_gaussian_label, &alpine_options_panel3, ao_gaussian_cbox_on_click, g_alpine_game_config.gaussian_spread, 280, 114, "Gaussian spread");
+        &ao_gaussian_cbox, &ao_gaussian_label, &alpine_options_panel3, ao_gaussian_cbox_on_click, g_alpine_game_config.gaussian_spread, 280, 114, "\xe9\xab\x98\xe6\x96\xaf\xe6\x95\xa3\xe5\xb8\x83");
     alpine_options_panel_checkbox_init(
-        &ao_bombrng_cbox, &ao_bombrng_label, &alpine_options_panel3, ao_bombrng_cbox_on_click, !g_alpine_game_config.static_bomb_code, 280, 144, "Randomize bomb");
+        &ao_bombrng_cbox, &ao_bombrng_label, &alpine_options_panel3, ao_bombrng_cbox_on_click, !g_alpine_game_config.static_bomb_code, 280, 144, "\xe9\x9a\x8f\xe6\x9c\xba\xe7\x82\xb8\xe5\xbc\xb9");
     alpine_options_panel_checkbox_init(
-        &ao_exposuredamage_cbox, &ao_exposuredamage_label, &alpine_options_panel3, ao_exposuredamage_cbox_on_click, g_alpine_game_config.apply_exposure_damage, 280, 174, "Exposure damage");
+        &ao_exposuredamage_cbox, &ao_exposuredamage_label, &alpine_options_panel3, ao_exposuredamage_cbox_on_click, g_alpine_game_config.apply_exposure_damage, 280, 174, "\xe6\x9a\xb4\xe9\x9c\xb2\xe4\xbc\xa4\xe5\xae\xb3");
 
     // fflink text (panel3)
     std::string fflink_username = g_game_config.fflink_username.value();
@@ -1266,13 +1266,13 @@ void alpine_options_panel_init() {
     std::string fflink_label_text2 = "";
     std::string fflink_label_text3 = "";
     if (fflink_username.empty()) {
-        fflink_label_text1 = "Alpine Faction is NOT linked to a FactionFiles account!";
-        fflink_label_text2 = "Linking enables achievements and map ratings.";
-        fflink_label_text3 = "Visit alpinefaction.com/link to link your account.";
+        fflink_label_text1 = "Alpine Faction \xe6\x9c\xaa\xe5\x85\xb3\xe8\x81\x94 FactionFiles \xe8\xb4\xa6\xe5\x8f\xb7\xef\xbc\x81";
+        fflink_label_text2 = "\xe5\x85\xb3\xe8\x81\x94\xe5\x90\x8e\xe5\x8f\xaf\xe4\xbd\xbf\xe7\x94\xa8\xe6\x88\x90\xe5\xb0\xb1\xe5\x92\x8c\xe5\x9c\xb0\xe5\x9b\xbe\xe8\xaf\x84\xe5\x88\x86\xe5\x8a\x9f\xe8\x83\xbd\xe3\x80\x82";
+        fflink_label_text3 = "\xe8\xae\xbf\xe9\x97\xae alpinefaction.com/link \xe5\x85\xb3\xe8\x81\x94\xe8\xb4\xa6\xe5\x8f\xb7\xe3\x80\x82";
     }
     else {
         fflink_label_text1 = "";
-        fflink_label_text2 = "Alpine Faction is linked to FactionFiles as " + fflink_username;
+        fflink_label_text2 = "Alpine Faction \xe5\xb7\xb2\xe5\x85\xb3\xe8\x81\x94 FactionFiles \xe8\xb4\xa6\xe5\x8f\xb7\xef\xbc\x9a" + fflink_username;
         fflink_label_text3 = "";
     }
 
@@ -1417,7 +1417,7 @@ CodeInjection options_init_build_button_patch{
     [](auto& regs) {
         //xlog::warn("Creating new button...");
         alpine_options_btn.init();
-        alpine_options_btn.create("button_more.tga", "button_selected.tga", 0, 0, 99, "ADVANCED", rf::ui::medium_font_0);
+        alpine_options_btn.create("button_more.tga", "button_selected.tga", 0, 0, 99, "\xe9\xab\x98\xe7\xba\xa7", rf::ui::medium_font_0);
         alpine_options_btn.key = 0x2E;
         alpine_options_btn.enabled = true;
     },
@@ -1468,7 +1468,7 @@ static constexpr int CTRL_CAMSCALE_Y = 107;
 
 static bool g_ctrl_camscale_initialized = false;
 
-static constexpr const char* camscale_mode_names[] = {"Classic", "Raw", "Modern"};
+static constexpr const char* camscale_mode_names[] = {"\xe7\xbb\x8f\xe5\x85\xb8", "\xe5\x8e\x9f\xe5\xa7\x8b", "\xe7\x8e\xb0\xe4\xbb\xa3"};
 
 static void ctrl_camscale_on_click(int, int)
 {
@@ -1504,7 +1504,7 @@ static void render_ctrl_camscale_btns()
     rf::gr::string_aligned(rf::gr::ALIGN_CENTER, val_x, val_y, ao_mousecamerascale_butlabel_text, rf::ui::medium_font_0);
     int name_x = static_cast<int>((ao_mousecamerascale_cbox.x + 87) * rf::ui::scale_x);
     rf::gr::set_color(0, 0, 0, 255);
-    rf::gr::string(name_x, val_y, "Mouse scale", rf::ui::medium_font_0);
+    rf::gr::string(name_x, val_y, "\xe9\xbc\xa0\xe6\xa0\x87\xe7\xbc\xa9\xe6\x94\xbe", rf::ui::medium_font_0);
 }
 
 static void handle_ctrl_camscale_btns(int x, int y)
@@ -1666,7 +1666,7 @@ CodeInjection options_audio_init_patch{
         levelsound_opt_button.enabled = true;
         alpine_audio_panel_settings_buttons.push_back(&levelsound_opt_button);
 
-        levelsound_opt_label.create(&rf::ui::audio_options_panel, 285, 178, "Environment Sounds Multiplier", rf::ui::medium_font_1);
+        levelsound_opt_label.create(&rf::ui::audio_options_panel, 285, 178, "\xe7\x8e\xaf\xe5\xa2\x83\xe9\x9f\xb3\xe6\x95\x88\xe5\x80\x8d\xe7\x8e\x87", rf::ui::medium_font_1);
         levelsound_opt_label.enabled = true;
     },
 };

@@ -1,6 +1,8 @@
 #include <memory>
 #include <unordered_map>
 #include <cstddef>
+#include <cstdint>
+#include <string_view>
 #include <exception>
 #include <cctype>
 #include <stdexcept>
@@ -8,8 +10,12 @@
 #include <patch_common/FunHook.h>
 #include <patch_common/CodeInjection.h>
 #include <patch_common/AsmWriter.h>
+#include <format>
+#include <algorithm>
+#include <cmath>
 #include <common/utils/string-utils.h>
 #include "../rf/gr/gr_font.h"
+#include "../rf/ui.h"
 #include "../rf/bmpman.h"
 #include "../rf/multi.h"
 #include "../rf/file/file.h"
@@ -85,10 +91,45 @@ private:
     int baseline_y_;
     int line_spacing_;
     std::vector<GlyphInfo> glyphs_;
-    int char_map_[256];
+    // Keyed by Unicode code point. High bytes of legacy Windows-1252 text are
+    // additionally registered under their raw byte value so both encodings
+    // resolve to the same glyph (see the constructor).
+    std::unordered_map<uint32_t, int> char_map_;
 };
 
 constexpr int ttf_font_flag = 0x1000;
+
+// Stock .vf bitmap fonts index glyphs by a single byte, so any non-Latin text
+// drawn with one comes out as per-byte mojibake. Alpine already swaps the four
+// rf::ui globals for TrueType, but some widgets (the weapon priority list and
+// the control binding list among them) hold a separate font handle and still
+// ask for a .vf. Redirect the three general-purpose text fonts to their
+// TrueType equivalents, using the same scale factors menu_init_hook uses, so
+// those widgets get a font that can actually render the text.
+//
+// bigfont.vf / smallfont.vf / biggerfont.vf are deliberately left alone: they
+// hold 32-69 glyphs with a non-standard first_ascii and are special-purpose
+// glyph sets (HUD counters), not general text.
+static std::string redirect_vf_font(const char* name)
+{
+    const float scale = rf::ui::scale_y;
+    if (!(scale > 1.0f)) {
+        return {};   // UI scale not known yet - keep the bitmap font
+    }
+    auto px = [scale](float factor) {
+        return std::min(128, static_cast<int>(std::round(scale * factor)));
+    };
+    if (string_iequals(name, "rfpc-large.vf")) {
+        return std::format("boldfont.ttf:{}", px(14.5f));
+    }
+    if (string_iequals(name, "rfpc-medium.vf")) {
+        return std::format("regularfont.ttf:{}", px(9.0f));
+    }
+    if (string_iequals(name, "rfpc-small.vf")) {
+        return std::format("regularfont.ttf:{}", px(7.5f));
+    }
+    return {};
+}
 
 FT_Library g_freetype_lib = nullptr;
 int g_default_font_id = 0;
@@ -133,6 +174,89 @@ static bool load_file_into_buffer(const char* name, std::vector<unsigned char>& 
         return false;
     }
     return true;
+}
+
+// ============================================================================
+// Support for non-Latin scripts (CJK and others)
+// ----------------------------------------------------------------------------
+// Glyphs used to be indexed by a single byte (char_map_[256]), which can only
+// hold the ~220 Windows-1252 characters. These two helpers extend that to
+// arbitrary Unicode code points:
+//   utf8_decode       - pull one code point out of a byte stream
+//   get_extra_charset - read the list of extra glyphs to rasterize, from a
+//                       packfile entry supplied by a translation mod
+// ============================================================================
+
+// Decode one UTF-8 code point at pos and advance pos.
+// On an invalid byte it falls back to returning that single byte. That both
+// guarantees forward progress and keeps legacy Windows-1252 text working:
+// bytes 0x80-0xFF are invalid UTF-8 lead bytes, so they come back unchanged
+// and can still be looked up by their byte value.
+static uint32_t utf8_decode(std::string_view text, size_t& pos)
+{
+    auto byte_at = [&](size_t i) { return static_cast<unsigned char>(text[i]); };
+    unsigned char lead = byte_at(pos);
+    if (lead < 0x80) {
+        ++pos;
+        return lead;
+    }
+    uint32_t cp;
+    int extra;
+    if ((lead & 0xE0) == 0xC0) { cp = lead & 0x1Fu; extra = 1; }
+    else if ((lead & 0xF0) == 0xE0) { cp = lead & 0x0Fu; extra = 2; }
+    else if ((lead & 0xF8) == 0xF0) { cp = lead & 0x07u; extra = 3; }
+    else { ++pos; return lead; }
+    if (pos + extra >= text.size()) {
+        ++pos;
+        return lead;
+    }
+    for (int i = 1; i <= extra; ++i) {
+        unsigned char cont = byte_at(pos + i);
+        if ((cont & 0xC0) != 0x80) {
+            ++pos;
+            return lead;
+        }
+        cp = (cp << 6) | (cont & 0x3Fu);
+    }
+    pos += extra + 1;
+    return cp;
+}
+
+// List of extra characters to rasterize. Lives in a packfile (e.g. a
+// translation mod's vpp) as plain UTF-8 text; only the set of characters that
+// appear in it matters, formatting is irrelevant. If the file is absent this
+// does nothing and behaviour is identical to stock.
+constexpr const char* extra_charset_filename = "alpine_extra_charset.txt";
+
+static const std::vector<uint32_t>& get_extra_charset()
+{
+    static std::vector<uint32_t> charset;
+    static bool loaded = false;
+    if (loaded) {
+        return charset;
+    }
+    loaded = true;
+    if (!rf::File{}.find(extra_charset_filename)) {
+        return charset;
+    }
+    std::vector<unsigned char> buffer;
+    if (!load_file_into_buffer(extra_charset_filename, buffer)) {
+        return charset;
+    }
+    std::string_view sv{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
+    std::unordered_map<uint32_t, bool> seen;
+    size_t pos = 0;
+    while (pos < sv.size()) {
+        uint32_t cp = utf8_decode(sv, pos);
+        if (cp < 0x80 || cp == 0xFEFF) {
+            continue;  // ASCII is already in the base set; FEFF is a BOM
+        }
+        if (seen.emplace(cp, true).second) {
+            charset.push_back(cp);
+        }
+    }
+    xlog::info("Loaded {} extra glyphs from {}", charset.size(), extra_charset_filename);
+    return charset;
 }
 
 template<typename T>
@@ -272,8 +396,8 @@ GrNewFont::GrNewFont(std::string_view name) :
         {0xF9, 0xFC},
     };
 
-    // Prepare character mapping and array of unicode code points
-    std::fill(char_map_, char_map_ + std::size(char_map_), -1);
+    // Base character set: Windows-1252, same as stock
+    char_map_.clear();
     std::vector<int> unicode_code_points;
     for (auto& range : win_1252_char_ranges) {
         for (auto c = range.first; c < range.second + 1; ++c) {
@@ -284,8 +408,23 @@ GrNewFont::GrNewFont(std::string_view name) :
             wchar_t unicode_char = 0;
             MultiByteToWideChar(1252, 0, &windows_1252_char, 1, &unicode_char, 1);
             unicode_code_points.push_back(unicode_char);
-            auto char_idx = static_cast<unsigned char>(windows_1252_char);
-            char_map_[char_idx] = unicode_code_points.size() - 1;
+            int glyph_idx = static_cast<int>(unicode_code_points.size()) - 1;
+            // Register both keys: stock tables are Windows-1252 (single byte),
+            // translated tables are UTF-8. Bytes 0x80-0xFF are invalid UTF-8 lead
+            // bytes, so the decoder returns them unchanged and the two encodings
+            // never collide. This keeps the German and French editions working.
+            char_map_[static_cast<uint32_t>(static_cast<unsigned char>(windows_1252_char))] = glyph_idx;
+            char_map_[static_cast<uint32_t>(unicode_char)] = glyph_idx;
+        }
+    }
+    // Extra character set (CJK etc.), registered by code point
+    if (!digits_only) {
+        for (uint32_t cp : get_extra_charset()) {
+            if (char_map_.find(cp) != char_map_.end()) {
+                continue;
+            }
+            unicode_code_points.push_back(static_cast<int>(cp));
+            char_map_[cp] = static_cast<int>(unicode_code_points.size()) - 1;
         }
     }
 
@@ -363,22 +502,23 @@ void GrNewFont::draw(int x, int y, std::string_view text, rf::gr::Mode state) co
     }
     int pen_x = x;
     int pen_y = y + baseline_y_;
-    for (auto ch : text) {
-        if (ch == '\n') {
+    size_t char_pos = 0;
+    while (char_pos < text.size()) {
+        uint32_t cp = utf8_decode(text, char_pos);
+        if (cp == static_cast<uint32_t>('\n')) {
             pen_x = x;
             pen_y += line_spacing_;
+            continue;
         }
-        else {
-            auto glyph_idx = char_map_[static_cast<unsigned char>(ch)];
-            if (glyph_idx != -1) {
-                const auto& glyph_info = glyphs_[glyph_idx];
-                if (glyph_info.bm_w) {
-                    // rf::gr::rect(pen_x + glyph_info.x, pen_y + glyph_info.y, glyph_info.bm_w, glyph_info.bm_h);
-                    rf::gr::bitmap_ex(bitmap_, pen_x + glyph_info.x, pen_y + glyph_info.y, glyph_info.bm_w, glyph_info.bm_h, glyph_info.bm_x, glyph_info.bm_y, state);
-                }
-                pen_x += glyph_info.advance_x;
-            }
+        auto it = char_map_.find(cp);
+        if (it == char_map_.end()) {
+            continue;
         }
+        const auto& glyph_info = glyphs_[it->second];
+        if (glyph_info.bm_w) {
+            rf::gr::bitmap_ex(bitmap_, pen_x + glyph_info.x, pen_y + glyph_info.y, glyph_info.bm_w, glyph_info.bm_h, glyph_info.bm_x, glyph_info.bm_y, state);
+        }
+        pen_x += glyph_info.advance_x;
     }
     rf::gr::current_string_x = pen_x;
     rf::gr::current_string_y = y;
@@ -416,18 +556,18 @@ void GrNewFont::get_size(int* w, int* h, std::string_view text) const
     *w = 0;
     *h = line_spacing_;
     int cur_line_w = 0;
-    for (auto ch : text) {
-        if (ch == '\n') {
+    size_t char_pos = 0;
+    while (char_pos < text.size()) {
+        uint32_t cp = utf8_decode(text, char_pos);
+        if (cp == static_cast<uint32_t>('\n')) {
             *w = std::max(*w, cur_line_w);
             cur_line_w = 0;
             *h += line_spacing_;
+            continue;
         }
-        else {
-            auto glyph_idx = char_map_[static_cast<unsigned char>(ch)];
-            if (glyph_idx != -1) {
-                const auto& glyph_info = glyphs_[glyph_idx];
-                cur_line_w += glyph_info.advance_x;
-            }
+        auto it = char_map_.find(cp);
+        if (it != char_map_.end()) {
+            cur_line_w += glyphs_[it->second].advance_x;
         }
     }
     *w = std::max(*w, cur_line_w);
@@ -465,8 +605,14 @@ FunHook<int(const char*, int)> gr_init_font_hook{
         if (rf::is_dedicated_server) {
            return -1;
         }
+        std::string redirected;
         if (string_ends_with(name, ".vf")) {
-            return gr_init_font_hook.call_target(name, reserved);
+            redirected = redirect_vf_font(name);
+            if (redirected.empty()) {
+                return gr_init_font_hook.call_target(name, reserved);
+            }
+            xlog::info("Redirecting bitmap font {} to {}", name, redirected);
+            name = redirected.c_str();   // outlives every use below
         }
         for (unsigned i = 0; i < g_fonts.size(); ++i) {
             auto& font = g_fonts[i];
@@ -505,8 +651,13 @@ FunHook<int(int)> gr_get_font_height_hook{
             font_num = g_default_font_id;
         }
         if (font_num & ttf_font_flag) {
-            auto& font = g_fonts[font_num & ~ttf_font_flag];
-            return font.get_height();
+            unsigned idx = static_cast<unsigned>(font_num & ~ttf_font_flag);
+            if (idx >= g_fonts.size()) {
+                xlog::error("gr_get_font_height: bad TTF font id {:#x} (have {})",
+                    font_num, g_fonts.size());
+                return 0;
+            }
+            return g_fonts[idx].get_height();
         }
         return gr_get_font_height_hook.call_target(font_num);
     },
@@ -519,8 +670,19 @@ FunHook<void(int, int, const char*, int, rf::gr::Mode)> gr_string_hook{
             font_num = g_default_font_id;
         }
         if (font_num & ttf_font_flag) {
-            auto& font = g_fonts[font_num & ~ttf_font_flag];
-            font.draw(x, y, text, mode);
+            unsigned idx = static_cast<unsigned>(font_num & ~ttf_font_flag);
+            if (idx >= g_fonts.size()) {
+                xlog::error("gr_string: bad TTF font id {:#x} (have {}) text={}",
+                    font_num, g_fonts.size(), text ? text : "(null)");
+                return;
+            }
+            try {
+                g_fonts[idx].draw(x, y, text, mode);
+            }
+            catch (const std::exception& e) {
+                xlog::error("gr_string threw: {} | font={:#x} text={}",
+                    e.what(), font_num, text ? text : "(null)");
+            }
         }
         else {
             gr_string_hook.call_target(x, y, text, font_num, mode);
@@ -535,7 +697,14 @@ FunHook<void(int*, int*, const char*, int, int)> gr_get_string_size_hook{
             font_num = g_default_font_id;
         }
         if (font_num & ttf_font_flag) {
-            auto& font = g_fonts[font_num & ~ttf_font_flag];
+            unsigned idx = static_cast<unsigned>(font_num & ~ttf_font_flag);
+            if (idx >= g_fonts.size()) {
+                xlog::error("gr_get_string_size: bad TTF font id {:#x} (have {})",
+                    font_num, g_fonts.size());
+                *out_width = 0;
+                *out_height = 0;
+                return;
+            }
             std::string_view text_sv;
             if (text_len < 0) {
                 text_sv = std::string_view{text};
@@ -543,7 +712,15 @@ FunHook<void(int*, int*, const char*, int, int)> gr_get_string_size_hook{
             else {
                 text_sv = std::string_view{text, static_cast<size_t>(text_len)};
             }
-            font.get_size(out_width, out_height, text_sv);
+            try {
+                g_fonts[idx].get_size(out_width, out_height, text_sv);
+            }
+            catch (const std::exception& e) {
+                xlog::error("gr_get_string_size threw: {} | font={:#x} len={}",
+                    e.what(), font_num, text_len);
+                *out_width = 0;
+                *out_height = 0;
+            }
         }
         else {
             gr_get_string_size_hook.call_target(out_width, out_height, text, text_len, font_num);
@@ -575,13 +752,137 @@ int gr_fit_string(
     }
 
     while (text_w + suffix_w > max_width && !text.empty()) {
-        const auto [last_w, last_h] = rf::gr::get_char_size(text.back(), font_id);
-        text_w -= last_w;
-        text.pop_back();
+        // Trim whole code points, otherwise a multi-byte character gets cut in half
+        size_t cut = text.size() - 1;
+        while (cut > 0 && (static_cast<unsigned char>(text[cut]) & 0xC0) == 0x80) {
+            --cut;
+        }
+        text.erase(cut);
+        const auto [new_w, new_h] = rf::gr::get_string_size(text, font_id);
+        text_w = new_w;
     }
 
     text.append(suffix);
     return text_w + suffix_w;
+};
+
+
+// ---- CJK aware line breaking ----
+// See gr_split_str_hook below. Break opportunities follow the usual CJK rules: a line
+// may break between two ideographs, but never before closing punctuation nor after
+// opening punctuation.
+static bool cjk_breakable(uint32_t cp)
+{
+    return (cp >= 0x2E80 && cp <= 0x9FFF)      // radicals, kana, CJK ideographs
+        || (cp >= 0xF900 && cp <= 0xFAFF)      // compatibility ideographs
+        || (cp >= 0x3000 && cp <= 0x303F)      // CJK punctuation
+        || (cp >= 0xFF00 && cp <= 0xFF60);     // fullwidth forms
+}
+
+static bool cjk_no_break_before(uint32_t cp)
+{
+    switch (cp) {
+    case 0x3001: case 0x3002: case 0xFF0C: case 0xFF0E:
+    case 0xFF1A: case 0xFF1B: case 0xFF01: case 0xFF1F:
+    case 0x300D: case 0x300F: case 0x3011: case 0x300B:
+    case 0xFF09: case 0x2019: case 0x201D:
+        return true;
+    default:
+        return false;
+    }
+}
+
+static bool cjk_no_break_after(uint32_t cp)
+{
+    switch (cp) {
+    case 0x300C: case 0x300E: case 0x3010: case 0x300A:
+    case 0xFF08: case 0x2018: case 0x201C:
+        return true;
+    default:
+        return false;
+    }
+}
+
+// Replacement for the engine's gr_split_str. Fills offset_array/len_array with byte
+// offsets and lengths of each line and returns the line count, same contract as the
+// original. unk_char is ignored: its meaning in the original is unclear and every
+// caller we can see passes 0. A newline always breaks, as it did before.
+FunHook<int(int*, int*, char*, int, int, char, int)> gr_split_str_hook{
+    0x00520810,
+    [](int* len_array, int* offset_array, char* text, int max_w, int max_lines, char unk_char,
+       int font_num) -> int {
+        static_cast<void>(unk_char);
+        if (!text || !len_array || !offset_array || max_lines <= 0 || max_w <= 0) {
+            return 0;
+        }
+        const std::string_view sv{text};
+        int n_lines = 0;
+        size_t line_start = 0;
+        size_t pos = 0;
+        int line_w = 0;
+        size_t break_end = 0;   // where the line would end if we break here
+        size_t break_next = 0;  // where the following line would start
+        uint32_t prev_cp = 0;
+        size_t prev_pos = 0;
+
+        auto emit = [&](size_t end, size_t next) {
+            offset_array[n_lines] = static_cast<int>(line_start);
+            len_array[n_lines] = static_cast<int>(end - line_start);
+            ++n_lines;
+            line_start = next;
+            pos = next;
+            line_w = 0;
+            break_end = 0;
+            break_next = 0;
+            prev_cp = 0;
+            prev_pos = 0;
+        };
+
+        while (pos < sv.size() && n_lines < max_lines) {
+            size_t next = pos;
+            const uint32_t cp = utf8_decode(sv, next);
+
+            if (cp == static_cast<uint32_t>('\n')) {
+                emit(pos, next);
+                continue;
+            }
+
+            // Record a break opportunity for the pair (prev_cp, cp) before placing cp,
+            // so that when cp turns out not to fit we already know where to cut.
+            if (prev_cp == static_cast<uint32_t>(' ')) {
+                break_end = prev_pos;   // the space itself is dropped
+                break_next = pos;
+            }
+            else if (prev_cp && !cjk_no_break_after(prev_cp) && !cjk_no_break_before(cp)
+                     && (cjk_breakable(prev_cp) || cjk_breakable(cp))) {
+                break_end = pos;
+                break_next = pos;
+            }
+
+            const int cw = rf::gr::get_string_size(sv.substr(pos, next - pos), font_num).first;
+            if (line_w + cw > max_w && pos > line_start) {
+                if (break_end > line_start) {
+                    emit(break_end, break_next);
+                }
+                else {
+                    emit(pos, pos);   // one word wider than the whole line: hard cut
+                }
+                continue;
+            }
+
+            line_w += cw;
+            prev_cp = cp;
+            prev_pos = pos;
+            pos = next;
+        }
+
+        if (line_start < sv.size() && n_lines < max_lines) {
+            offset_array[n_lines] = static_cast<int>(line_start);
+            len_array[n_lines] = static_cast<int>(sv.size() - line_start);
+            ++n_lines;
+        }
+        return n_lines;
+    },
 };
 
 void gr_font_apply_patch()
@@ -598,6 +899,7 @@ void gr_font_apply_patch()
     gr_get_font_height_hook.install();
     gr_string_hook.install();
     gr_get_string_size_hook.install();
+    gr_split_str_hook.install();
     init_freetype_lib();
 
     // Do not increament number of loaded fonts before a successful load

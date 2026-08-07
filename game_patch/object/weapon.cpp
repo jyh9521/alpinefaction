@@ -52,9 +52,29 @@ CodeInjection weapons_tbl_buffer_overflow_fix_2{
     },
 };
 
+static void weapon_cn_fix_display_names()
+{
+    static const struct { const char* en; const char* zh; } cn_names[] = {
+        {"Remote Charge Detonator", "\xe8\xb5\xb7\xe7\x88\x86\xe5\x99\xa8"},
+    };
+    for (int i = 0; i < rf::num_weapon_types && i < 64; ++i) {
+        rf::WeaponInfo& wi = rf::weapon_types[i];
+        for (const auto& e : cn_names) {
+            // With no $Display Name: the engine may leave display_name empty or copy
+            // $Name: into it, so accept either. rf::String::operator== does the strcmp
+            // and handles a null buffer, which saves pulling in <cstring>.
+            if (wi.display_name == e.en || (wi.display_name.empty() && wi.name == e.en)) {
+                wi.display_name = e.zh;
+                break;
+            }
+        }
+    }
+}
+
 CodeInjection weapon_init_track_reticle_bitmap_injection{
     0x004C6756,
     [](auto& regs) {
+        weapon_cn_fix_display_names();
         weapon_reticle_custom_mask.fill(0);
         rocket_locked_custom_reticle = {false, false};
 

@@ -334,7 +334,7 @@ ConsoleCommand2 ms_scale_cmd{
                 reset_mouse_delta_accumulators();
             }
         }
-        static constexpr const char* mode_names[] = {"Classic", "Raw", "Modern"};
+        static constexpr const char* mode_names[] = {"\xe7\xbb\x8f\xe5\x85\xb8", "\xe5\x8e\x9f\xe5\xa7\x8b", "\xe7\x8e\xb0\xe4\xbb\xa3"};
         int mode = std::clamp(g_alpine_game_config.mouse_scale, 0, 2);
         rf::console::print("ms_scale: {} ({})", mode, mode_names[mode]);
     },

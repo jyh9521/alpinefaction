@@ -146,7 +146,7 @@ int draw_scoreboard_header(int x, int y, int w, rf::NetGameType game_type, bool 
     // Draw Game Type name
     if (!dry_run) {
         const std::string game_info = std::format(
-            "{} \x95 {}/{} PLAYING",
+            "{} \xe2\x80\xa2 {}/{} PLAYING",
             multi_game_type_name_upper(game_type),
             multi_num_spawned_players(),
             rf::multi_num_players()
@@ -174,7 +174,7 @@ int draw_scoreboard_header(int x, int y, int w, rf::NetGameType game_type, bool 
     if (!dry_run) {
         rf::gr::set_color(0xB0, 0xB0, 0xB0, 0xFF);
         std::string level_info = std::format(
-            "{1} \x95 {0:%Y} ({2}) by {3}",
+            "{1} \xe2\x80\xa2 {0:%Y} ({2}) by {3}",
             std::chrono::sys_seconds{
                 std::chrono::seconds{rf::level.level_timestamp}
             },

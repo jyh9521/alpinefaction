@@ -17,6 +17,9 @@
 #include "../misc/alpine_settings.h"
 #include "../sound/sound.h"
 
+// Defined in sound.cpp
+extern void npc_subtitle_render();
+
 static constexpr rf::ControlConfigAction default_skip_cutscene_ctrl = rf::CC_ACTION_MP_STATS;
 
 static void render_skip_cutscene_hint_text(rf::ControlConfigAction action)
@@ -47,6 +50,11 @@ FunHook<void(bool)> cutscene_do_frame_hook{
         if (!skip_cutscene) {
             cutscene_do_frame_hook.call_target(dlg_open);
             render_skip_cutscene_hint_text(skip_cutscene_ctrl);
+            // HUD is not drawn during cutscenes, so the voice subtitle channel
+            // has to be driven from here as well. npc_subtitle_render() skips
+            // repeat calls within the same frame, so this is safe even if the
+            // HUD path happens to run too.
+            npc_subtitle_render();
         }
         else {
             xlog::info("Skipping cutscene...");

@@ -238,39 +238,39 @@ CodeInjection control_config_init_patch{
             starting_alpine_control_index = ccp->num_bindings;
         }
 
-        alpine_control_config_add_item(ccp, "Toggle Headlamp", 0, rf::KEY_F, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe5\x88\x87\xe6\x8d\xa2\xe5\xa4\xb4\xe7\x81\xaf", 0, rf::KEY_F, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_FLASHLIGHT);
-        alpine_control_config_add_item(ccp, "Skip Cutscene", 0, rf::KEY_L, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe8\xb7\xb3\xe8\xbf\x87\xe8\xbf\x87\xe5\x9c\xba", 0, rf::KEY_L, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_SKIP_CUTSCENE);
-        alpine_control_config_add_item(ccp, "Respawn", 0, rf::KEY_K, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe9\x87\x8d\xe7\x94\x9f", 0, rf::KEY_K, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_SELF_KILL);
-        alpine_control_config_add_item(ccp, "Vote Yes", 0, rf::KEY_F1, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe6\x8a\x95\xe8\xb5\x9e\xe6\x88\x90\xe7\xa5\xa8", 0, rf::KEY_F1, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_VOTE_YES);
-        alpine_control_config_add_item(ccp, "Vote No", 0, rf::KEY_F2, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe6\x8a\x95\xe5\x8f\x8d\xe5\xaf\xb9\xe7\xa5\xa8", 0, rf::KEY_F2, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_VOTE_NO);
-        alpine_control_config_add_item(ccp, "Ready For Match", 0, rf::KEY_F3, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe5\x87\x86\xe5\xa4\x87\xe5\xb0\xb1\xe7\xbb\xaa", 0, rf::KEY_F3, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_READY);
-        alpine_control_config_add_item(ccp, "Drop Flag", 0, rf::KEY_G, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe4\xb8\xa2\xe5\xbc\x83\xe6\x97\x97\xe5\xb8\x9c", 0, rf::KEY_G, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_DROP_FLAG);
-        alpine_control_config_add_item(ccp, "Radio Message Menu", 0, rf::KEY_V, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe7\x94\xb5\xe5\x8f\xb0\xe6\xb6\x88\xe6\x81\xaf\xe8\x8f\x9c\xe5\x8d\x95", 0, rf::KEY_V, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_CHAT_MENU);
-        alpine_control_config_add_item(ccp, "Taunt Menu", 0, rf::KEY_B, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe5\x98\xb2\xe8\xae\xbd\xe8\x8f\x9c\xe5\x8d\x95", 0, rf::KEY_B, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_TAUNT_MENU);
-        alpine_control_config_add_item(ccp, "Command Menu", 0, rf::KEY_N, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe6\x8c\x87\xe4\xbb\xa4\xe8\x8f\x9c\xe5\x8d\x95", 0, rf::KEY_N, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_COMMAND_MENU);
-        alpine_control_config_add_item(ccp, "Ping Location", 0, -1, -1, 2, // Mouse 3
+        alpine_control_config_add_item(ccp, "\xe6\xa0\x87\xe8\xae\xb0\xe4\xbd\x8d\xe7\xbd\xae", 0, -1, -1, 2, // Mouse 3
                                        rf::AlpineControlConfigAction::AF_ACTION_PING_LOCATION);
-        alpine_control_config_add_item(ccp, "Spectate Mode Menu", 0, rf::KEY_COMMA, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe8\xa7\x82\xe6\x88\x98\xe6\xa8\xa1\xe5\xbc\x8f\xe8\x8f\x9c\xe5\x8d\x95", 0, rf::KEY_COMMA, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_SPECTATE_MENU);
-        alpine_control_config_add_item(ccp, "Suppress Autoswitch", 0, -1, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe6\x8a\x91\xe5\x88\xb6\xe8\x87\xaa\xe5\x8a\xa8\xe5\x88\x87\xe6\x8d\xa2", 0, -1, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_NO_AUTOSWITCH);
-        alpine_control_config_add_item(ccp, "Remote Server Config", false, rf::KEY_F5, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe8\xbf\x9c\xe7\xa8\x8b\xe6\x9c\x8d\xe5\x8a\xa1\xe5\x99\xa8\xe9\x85\x8d\xe7\xbd\xae", false, rf::KEY_F5, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_REMOTE_SERVER_CFG);
-        alpine_control_config_add_item(ccp, "Inspect Weapon", false, rf::KEY_I, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe6\x9f\xa5\xe7\x9c\x8b\xe6\xad\xa6\xe5\x99\xa8", false, rf::KEY_I, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_INSPECT_WEAPON);
-        alpine_control_config_add_item(ccp, "Cycle Spectate Modes", false, rf::KEY_PERIOD, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe5\x88\x87\xe6\x8d\xa2\xe8\xa7\x82\xe6\x88\x98\xe6\xa8\xa1\xe5\xbc\x8f", false, rf::KEY_PERIOD, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_SPECTATE_TOGGLE_FREELOOK);
-        alpine_control_config_add_item(ccp, "Toggle Spectate", false, rf::KEY_DIVIDE, -1, -1,
+        alpine_control_config_add_item(ccp, "\xe5\x88\x87\xe6\x8d\xa2\xe8\xa7\x82\xe6\x88\x98", false, rf::KEY_DIVIDE, -1, -1,
                                        rf::AlpineControlConfigAction::AF_ACTION_SPECTATE_TOGGLE);
     },
 };

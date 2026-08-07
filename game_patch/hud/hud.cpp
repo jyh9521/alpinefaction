@@ -301,7 +301,19 @@ std::string hud_fit_string(std::string_view str, int max_w, int* str_w_out, int 
     bool has_ellipsis = false;
     auto [str_w, str_h] = rf::gr::get_string_size(result, font_id);
     while (str_w > max_w) {
-        result = result.substr(0, result.size() - (has_ellipsis ? 4 : 1)) + "...";
+        if (has_ellipsis) {
+            result.erase(result.size() - 3);  // drop the "..." added last round
+        }
+        if (result.empty()) {
+            break;
+        }
+        // Step back one whole code point, never split a multi-byte character
+        size_t cut = result.size() - 1;
+        while (cut > 0 && (static_cast<unsigned char>(result[cut]) & 0xC0) == 0x80) {
+            --cut;
+        }
+        result.erase(cut);
+        result += "...";
         has_ellipsis = true;
         std::tie(str_w, str_h) = rf::gr::get_string_size(result, font_id);
     }

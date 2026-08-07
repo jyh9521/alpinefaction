@@ -1213,12 +1213,18 @@ CallHook<void(int *dx, int *dy, int *dz)> control_config_get_mouse_delta_hook{
     }
 };
 
+// Defined in sound.cpp. Alpine already hooks 0x004382D0, so the voice subtitle
+// channel draws from inside that hook rather than installing a second one --
+// two FunHooks on one address means whichever installs last silently wins.
+extern void npc_subtitle_render();
+
 FunHook<void()> hud_msg_render_hook{
     0x004382D0,
     [] {
         if (!g_remote_server_cfg_popup.is_active()) {
             hud_msg_render_hook.call_target();
         }
+        npc_subtitle_render();
     },
 };
 
