@@ -328,7 +328,7 @@ const char* hud_get_small_font_name(bool big)
     if (big) {
         return "regularfont.ttf:14";
     }
-    return "rfpc-small.vf";
+    return "regularfont.ttf:11";  // was rfpc-small.vf; bitmap fonts cannot show CJK
 }
 
 const char* hud_get_default_font_name(bool big)
@@ -336,7 +336,7 @@ const char* hud_get_default_font_name(bool big)
     if (big) {
         return "regularfont.ttf:17";
     }
-    return "rfpc-medium.vf";
+    return "regularfont.ttf:13";  // was rfpc-medium.vf
 }
 
 const char* hud_get_bold_font_name(bool big)
@@ -344,7 +344,7 @@ const char* hud_get_bold_font_name(bool big)
     if (big) {
         return "boldfont.ttf:26";
     }
-    return "rfpc-large.vf";
+    return "boldfont.ttf:20";  // was rfpc-large.vf
 }
 
 int hud_get_small_font()
